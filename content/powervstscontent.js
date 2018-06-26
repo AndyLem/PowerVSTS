@@ -23,11 +23,11 @@ function checkPage() {
                 }
             }
             if (StoryPointsColumnIndex != -1) {
-                var sprintWorkingDaysDiv = document.getElementsByClassName('sprint-working-days')[0];
+                SprintWorkingDaysDiv = document.getElementsByClassName('sprint-working-days')[0];
 
-                if (sprintWorkingDaysDiv) {
+                if (SprintWorkingDaysDiv) {
                     StoryPointsSpan = document.createElement("span", { id : 'storyPoints' });
-                    sprintWorkingDaysDiv.appendChild(StoryPointsSpan);
+                    SprintWorkingDaysDiv.appendChild(StoryPointsSpan);
                     return true;
                 }
             }
@@ -70,8 +70,14 @@ function setStoryPoints(outputDiv) {
     outputDiv.setAttribute('title', 'Scroll the backlog to refresh this value');
 }
 
+function checkOutputSpanExistence(parentElement) {
+    if (!StoryPointsSpan.parentElement)
+        parentElement.appendChild(StoryPointsSpan);
+}
+
 function update() {
     collectWorkItems(ProductBacklogTable, StoryPointsColumnIndex);
+    checkOutputSpanExistence(SprintWorkingDaysDiv);
     setStoryPoints(StoryPointsSpan);
 }
 
@@ -99,6 +105,7 @@ var observeDOM = (function(){
 setTimeout(
     function () {
         if (checkPage()) {
+            console.log('Backlog detected');
             update();
 
             observeDOM( document.getElementsByClassName('productbacklog-grid-results')[0],
@@ -106,7 +113,12 @@ setTimeout(
                 console.log('Backlog has been changed. Updating storypoints')
                 update();
             });
-            console.log('Backlog detected');
+
+            // observeDOM(document.getElementsByClassName('sprint-dates-working-days')[0],
+            // function(){ 
+            //     console.log('Header has been changed. Updating storypoints')
+            //     update();
+            // });
             
         } else {
             console.log('Backlog is not detected');
