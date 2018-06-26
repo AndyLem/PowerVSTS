@@ -5,6 +5,8 @@ var StoryPointColumnName = "Story Points";
 var SprintWorkingDaysDiv = null;
 var ProductBacklogTable = null;
 var SprintWorkingDaysDivDefaultValue = "";
+var StoryPointsSpan = null;
+var WorkItems = {};
 
 function checkPage() {
 
@@ -21,10 +23,11 @@ function checkPage() {
                 }
             }
             if (StoryPointsColumnIndex != -1) {
-                SprintWorkingDaysDiv = document.getElementsByClassName('sprint-working-days')[0];
+                var sprintWorkingDaysDiv = document.getElementsByClassName('sprint-working-days')[0];
 
-                if (SprintWorkingDaysDiv) {
-                    SprintWorkingDaysDivDefaultValue = SprintWorkingDaysDiv.innerText;
+                if (sprintWorkingDaysDiv) {
+                    StoryPointsSpan = document.createElement("span", { id : 'storyPoints' });
+                    sprintWorkingDaysDiv.appendChild(StoryPointsSpan);
                     return true;
                 }
             }
@@ -33,17 +36,43 @@ function checkPage() {
     return false;
 }
 
-function setStoryPoints(backLogTable, columnIndex, outputDiv) {
-    var storyPoints = 0;
-    var rows = backLogTable.getElementsByClassName('grid-row grid-row-normal');
+function collectWorkItems(backlogTable, columnIndex) {
+    var rows = backlogTable.getElementsByClassName('grid-row grid-row-normal');
     for (var i=0;i<rows.length;i++) {
         var spColumn = rows[i].getElementsByClassName('grid-cell')[columnIndex];
         if (spColumn) {
             var val = Number(spColumn.innerText);
-            storyPoints += val;
+            if (val != 0)
+                WorkItems[rows[i].getAttribute('id')] = val;
         }
     }
-    outputDiv.innerText = SprintWorkingDaysDivDefaultValue + " (" + storyPoints + " story points)";
+
+    
+}
+
+function setStoryPoints(outputDiv) {
+    var storyPoints = 0;
+    // var rows = backLogTable.getElementsByClassName('grid-row grid-row-normal');
+    // for (var i=0;i<rows.length;i++) {
+    //     var spColumn = rows[i].getElementsByClassName('grid-cell')[columnIndex];
+    //     if (spColumn) {
+    //         var val = Number(spColumn.innerText);
+    //         storyPoints += val;
+    //     }
+    // }
+    for (var key in WorkItems) {
+        storyPoints += WorkItems[key];
+    }
+
+    console.log('storypoints calculated: ' + storyPoints);
+
+    outputDiv.innerText = " (" + storyPoints + " story points)";
+    outputDiv.setAttribute('title', 'Scroll the backlog to refresh this value');
+}
+
+function update() {
+    collectWorkItems(ProductBacklogTable, StoryPointsColumnIndex);
+    setStoryPoints(StoryPointsSpan);
 }
 
 var observeDOM = (function(){
@@ -67,14 +96,15 @@ var observeDOM = (function(){
     };
 })();
 
-// Observe a specific DOM element:
-
-
 setTimeout(
     function () {
         if (checkPage()) {
-            observeDOM( document.getElementsByClassName('grid-row grid-row-normal')[0] ,function(){ 
-                setStoryPoints(ProductBacklogTable, StoryPointsColumnIndex, SprintWorkingDaysDiv);
+            update();
+
+            observeDOM( document.getElementsByClassName('productbacklog-grid-results')[0],
+            function(){ 
+                console.log('Backlog has been changed. Updating storypoints')
+                update();
             });
             console.log('Backlog detected');
             
@@ -82,30 +112,4 @@ setTimeout(
             console.log('Backlog is not detected');
         }
     },
-    2000);
-
-
-    var objs = []; // we'll store the object references in this array
-
-    function walkTheObject( obj ) {
-        var keys = Object.keys( obj ); // get all own property names of the object
-    
-        keys.forEach( function ( key ) {
-            var value = obj[ key ]; // get property value
-    
-            // if the property value is an object...
-            if ( value && typeof value === 'object' ) { 
-    
-                // if we don't have this reference...
-                if ( objs.indexOf( value ) < 0 ) {
-                    objs.push( value ); // store the reference
-                    walkTheObject( value ); // traverse all its own properties
-                } 
-    
-            }
-        });
-    }
-    
-    walkTheObject( this ); // start with the global object
-
-    console.log(objs);
+    2000);   
