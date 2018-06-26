@@ -52,14 +52,7 @@ function collectWorkItems(backlogTable, columnIndex) {
 
 function setStoryPoints(outputDiv) {
     var storyPoints = 0;
-    // var rows = backLogTable.getElementsByClassName('grid-row grid-row-normal');
-    // for (var i=0;i<rows.length;i++) {
-    //     var spColumn = rows[i].getElementsByClassName('grid-cell')[columnIndex];
-    //     if (spColumn) {
-    //         var val = Number(spColumn.innerText);
-    //         storyPoints += val;
-    //     }
-    // }
+
     for (var key in WorkItems) {
         storyPoints += WorkItems[key];
     }
@@ -112,16 +105,9 @@ setTimeout(
             function(){ 
                 console.log('Backlog has been changed. Updating storypoints')
                 update();
-            });
-
-            // observeDOM(document.getElementsByClassName('sprint-dates-working-days')[0],
-            // function(){ 
-            //     console.log('Header has been changed. Updating storypoints')
-            //     update();
-            // });
-            
+            });            
         } else {
-            console.log('Backlog is not detected');
+            console.log('Backlog is not detected. Nothing to do');
         }
     },
     2000);   
