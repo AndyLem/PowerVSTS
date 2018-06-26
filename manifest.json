@@ -1,0 +1,14 @@
+{
+    "name": "Power VSTS",
+    "version": "1.0",
+    "description": "Extend the VSTS",
+    "permissions": ["activeTab"],
+    "content_scripts": [
+        {
+          "matches": ["https://*.visualstudio.com/*"],
+          "js": ["content/powervstscontent.js"]
+        }
+      ],
+    "manifest_version": 2
+  }
+  
