@@ -1,0 +1,2 @@
+VSTS Page dynamically builds the backlog grid, keeping only visible items in the DOM. 
+As a quick workaround the script gathers all Work Items into a collection on every DOM change. It allows to incrementally calculate the sum of story points as they appear on the page.

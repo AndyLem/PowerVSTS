@@ -9,31 +9,28 @@ var StoryPointsSpan = null;
 var WorkItems = {};
 
 function checkPage() {
+    return (document.getElementsByClassName('productbacklog-grid-results')[0]
+        && document.getElementsByClassName('grid-header-canvas')[0]
+        && document.getElementsByClassName('sprint-working-days')[0]);
+}
+
+function getPageElements() {
 
     ProductBacklogTable = document.getElementsByClassName('productbacklog-grid-results')[0];
-    if (ProductBacklogTable) {
-        var backlogHeader = ProductBacklogTable.getElementsByClassName('grid-header-canvas')[0];
-        if (backlogHeader) {
-            var columns = backlogHeader.getElementsByClassName('grid-header-column');
-            StoryPointsColumnIndex = -1;
-            for (var i = 0; i < columns.length; i++) {
-                if (columns[i].getAttribute('aria-label') == StoryPointColumnName) {
-                    StoryPointsColumnIndex = i;
-                    break;
-                }
-            }
-            if (StoryPointsColumnIndex != -1) {
-                SprintWorkingDaysDiv = document.getElementsByClassName('sprint-working-days')[0];
-
-                if (SprintWorkingDaysDiv) {
-                    StoryPointsSpan = document.createElement("span", { id : 'storyPoints' });
-                    SprintWorkingDaysDiv.appendChild(StoryPointsSpan);
-                    return true;
-                }
-            }
+    var backlogHeader = ProductBacklogTable.getElementsByClassName('grid-header-canvas')[0];
+    var columns = backlogHeader.getElementsByClassName('grid-header-column');
+    StoryPointsColumnIndex = -1;
+    for (var i = 0; i < columns.length; i++) {
+        if (columns[i].getAttribute('aria-label') == StoryPointColumnName) {
+            StoryPointsColumnIndex = i;
+            break;
         }
     }
-    return false;
+    SprintWorkingDaysDiv = document.getElementsByClassName('sprint-working-days')[0];
+
+    StoryPointsSpan = StoryPointsSpan 
+        ? StoryPointsSpan 
+        : document.createElement("span", { id : 'storyPoints' });
 }
 
 function collectWorkItems(backlogTable, columnIndex) {
@@ -46,8 +43,6 @@ function collectWorkItems(backlogTable, columnIndex) {
                 WorkItems[rows[i].getAttribute('id')] = val;
         }
     }
-
-    
 }
 
 function setStoryPoints(outputDiv) {
@@ -69,6 +64,7 @@ function checkOutputSpanExistence(parentElement) {
 }
 
 function update() {
+    getPageElements();
     collectWorkItems(ProductBacklogTable, StoryPointsColumnIndex);
     checkOutputSpanExistence(SprintWorkingDaysDiv);
     setStoryPoints(StoryPointsSpan);
@@ -103,7 +99,7 @@ setTimeout(
 
             observeDOM( document.getElementsByClassName('productbacklog-grid-results')[0],
             function(){ 
-                console.log('Backlog has been changed. Updating storypoints')
+                console.log('Backlog DOM has been changed. Updating storypoints')
                 update();
             });            
         } else {
